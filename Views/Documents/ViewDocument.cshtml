@@ -1,0 +1,194 @@
+﻿@model DocumentsModel
+@{
+    ViewData["Title"] = Model.Description;
+}
+@section Style
+{
+    <link href="~/assets/libs/lightbox2/css/lightbox.min.css" rel="stylesheet" />
+}
+
+<div class="row">
+    <div class="col-6 offset-1">
+        <!-- project card -->
+        <div class="card d-block">
+            <div class="card-body">
+                <div class="dropdown float-end">
+                    <a href="#" class="dropdown-toggle arrow-none text-muted" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="mdi mdi-dots-horizontal font-18"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item"> <i class="mdi mdi-attachment me-1"></i>Attachment </a>
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item"> <i class="mdi mdi-pencil-outline me-1"></i>Edit </a>
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item"> <i class="mdi mdi-content-copy me-1"></i>Mark as Duplicate </a>
+                        <div class="dropdown-divider"></div>
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item text-danger"> <i class="mdi mdi-delete-outline me-1"></i>Delete </a>
+                    </div>
+                    <!-- end dropdown menu-->
+                </div>
+                <!-- end dropdown-->
+
+                <h4 class="mt-0 mb-0">@Model.Description</h4>
+                <h5 class="mt-1 mb-0">@Model.Name</h5>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="mt-2 mb-0 text-muted">Папка</p>
+                        <div class="d-flex align-items-start">
+                            <i class="mdi mdi-folder-outline font-18 text-success me-1"></i>
+                            <div class="w-100">
+                                <h5 class="mt-1 font-size-14">
+                                    @Model.Folder
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mt-2 mb-0 text-muted">Дело</p>
+                        <div class="d-flex align-items-start">
+                            <i class="mdi  mdi-inbox-full-outline font-18 text-success me-1"></i>
+                            <div class="w-100">
+                                <h5 class="mt-1 font-size-14">
+                                    @Model.Service
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mt-2 mb-0 text-muted">Период</p>
+                        <div class="d-flex align-items-start">
+                            <i class="mdi mdi-calendar-month-outline font-18 text-success me-1"></i>
+                            <div class="w-100">
+                                <h5 class="mt-1 font-size-14">
+                                    @($"{Model.YearStart}-{Model.YearStop} гг.")
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end col -->
+                </div>
+                <!-- end row -->
+
+                <h5 class="mt-3">Метаданные:</h5>
+
+                @if (Model.Metadata.Any())
+                {
+                    <div class="row">
+                        @foreach (var item in Model.Metadata)
+                        {
+                            <div class="col-auto">
+                                <p class="m-0 p-0 text-muted">@item.Name:</p>
+                                <p class="m-0 p-0">@item.Value</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-4">-</p>
+                }
+
+                @*@if (Model.Files.Any())
+                {
+                    <h5 class="mt-3">Контент:</h5>
+                    <div class="accordion custom-accordion" id="accordion-one">
+                        @foreach (var file in Model.Files)
+                        {
+                            <div class="card mb-0">
+                                <div class="card-header" id="heading-@file.Id" style="background-color: white;">
+                                    <h5 class="m-0 position-relative">
+                                        <a class="custom-accordion-title text-reset d-block"
+                                           data-bs-toggle="collapse" href="#collapse-@file.Id"
+                                           aria-expanded="true" aria-controls="collapseNine">
+                                            @file.FileName <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                        </a>
+                                    </h5>
+                                </div>
+
+                                <div id="collapse-@file.Id" class="collapse"
+                                     aria-labelledby="headingFour"
+                                     data-bs-parent="#accordion-one">
+                                    <div class="card-body">
+                                        @Html.Raw(file.FileContent)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }*@
+            </div>
+            <!-- end card-body-->
+        </div>
+        <!-- end card-->
+    </div>
+    <!-- end col -->
+
+    <div class="col-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="dropdown float-end">
+                    <a href="#" class="dropdown-toggle arrow-none text-muted" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="mdi mdi-dots-horizontal font-18"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item"> <i class="mdi mdi-attachment me-1"></i>Attachment </a>
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item"> <i class="mdi mdi-pencil-outline me-1"></i>Edit </a>
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item"> <i class="mdi mdi-content-copy me-1"></i>Mark as Duplicate </a>
+                        <div class="dropdown-divider"></div>
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item text-danger"> <i class="mdi mdi-delete-outline me-1"></i>Delete </a>
+                    </div>
+                    <!-- end dropdown menu-->
+                </div>
+                <!-- end dropdown-->
+
+                <h5 class="card-title font-16 mb-3">Документы</h5>
+                <!-- Preview -->
+
+                @if (Model.Files.Any())
+                {
+                    foreach (var file in Model.Files)
+                    {
+                        <div class="card mb-1 shadow-none border">
+                            <div class="p-2">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <div class="avatar-sm">
+                                            <span class="avatar-title badge-soft-primary text-primary rounded text-uppercase">
+                                                @file.FileExt.Remove(0, 1)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col ps-0">
+                                        <a href="javascript:void(0);" class="text-muted fw-bold">@file.FileName</a>
+                                        <p class="mb-0 font-12" data-toggle="formatBytes">@file.FileSize</p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <!-- Button -->
+                                        <a href="@Url.Action("DownloadFile", new{ Id = file.Id})" target="_blank" data-lightbox="Документы" data-title="@file.FileName" class="btn btn-link font-16 text-muted pe-1">
+                                            <i class="dripicons-preview"></i>
+                                        </a>
+                                        <a asp-action="DownloadFile" asp-route-id="@file.Id" target="_blank" class="btn btn-link font-16 text-muted ps-1">
+                                            <i class="dripicons-download"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/assets/libs/lightbox2/js/lightbox.min.js"></script>
+}

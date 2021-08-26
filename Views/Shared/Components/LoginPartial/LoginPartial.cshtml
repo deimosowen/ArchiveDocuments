@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ArchiveDocuments.Data.Entities
+@model ArchiveDocuments.Data.Entities.ApplicationUserInfo
+@inject SignInManager<ApplicationUser> _signInManager
+
+<li class="dropdown notification-list topbar-dropdown">
+    @if (_signInManager.IsSignedIn(User))
+    {
+        <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+            <div class="pro-user-img">
+                <span>
+                    @($"{Model.BadgeName}")
+                </span>
+            </div>
+            <span class="pro-user-name ms-1">
+                @($"{Model.LastName} {Model.FirstName}") <i class="mdi mdi-chevron-down"></i>
+            </span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end profile-dropdown" style="">
+            <!-- item-->
+
+            @*<div class="dropdown-divider"></div>*@
+
+            <!-- item-->
+            <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+                <button class="dropdown-item notify-item">
+                    <i class="fe-log-out"></i>
+                    <span>Выход</span>
+                </button>
+            </form>
+        </div>
+    }
+</li>

@@ -1,0 +1,151 @@
+﻿@model SearchDocumentsRequestModel
+@{
+    ViewData["Title"] = "Поиск";
+}
+<style>
+    mark{
+        background: orange;
+        color: black;
+    }
+</style>
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="search-result-box card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <form asp-action="Search" class="pt-3 pb-4">
+                            <div class="input-group">
+                                <input asp-for="Query" class="form-control" placeholder="Поиск...">
+                                <button type="submit" class="input-group-text btn waves-effect waves-light btn-blue"><i class="fa fa-search me-1"></i> Поиск</button>
+                            </div>
+                            <div class="input-group justify-content-end">
+                                <select asp-items="Model.OrganizationList" asp-for="OrganizationId" data-toggle="select2" style="width: 220px;"></select>
+                                <select asp-items="Model.DocumentList" asp-for="DocumentId" data-toggle="select2" style="width: 160px;"></select>
+                            </div>
+                            @*<div class="mt-3 text-center">
+                                    <h4>Search Results For "Admin Dashboard"</h4>
+                                </div>*@
+                        </form>
+                    </div>
+                </div>
+                <!-- end row -->
+
+                <div>
+                    @*<hr class="mt-0 nav-bordered" />*@
+                    @if (string.IsNullOrEmpty(Model.Query))
+                    {
+                        <div class="font-15 text-center text-muted my-4">
+                            <i class="fe-inbox font-28"></i><br />
+                            Воспользуйтесь поиском
+                        </div>
+                    }
+                    else if (!Model.Documents.Any())
+                    {
+                        <div class="font-15 text-center text-muted my-4">
+                            <i class="fe-inbox font-28"></i><br />
+                            Поиск не дал результатов
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Documents)
+                        {
+                            <div class="search-item">
+                                <div class="d-flex align-items-start">
+                                    <div class="w-100">
+                                        <h5 class="mt-0">
+                                            <a asp-action="ViewDocument" asp-route-id="@item.Id" target="_blank">@item.Description</a>
+                                        </h5>
+                                        <h6>@item.Name</h6>
+
+                                        <p class="mb-0 font-13">
+                                            <b>Метаданные:</b>
+                                            <br>
+                                            @if (item.Metadata.Any())
+                                            {
+                                                <span class="text-muted">
+                                                    @string.Join(" ", item.Metadata.Select(s => s.Value))
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </p>
+                                        @if (!Model.Documents.Any(a => string.IsNullOrWhiteSpace(a.FileContent)))
+                                        {
+                                            <p class="mb-0 font-13" id="file-content">
+                                                @string.Join(' ', Model.Documents.Select(s => s.FileContent))
+                                            </p>
+                                        }
+                                        <p class="font-13 mb-0 mt-1">
+                                            <span class="border-end me-1 pe-1">
+                                                <b><i class="mdi mdi-folder-outline"></i></b>
+                                                <span class="text-muted">@($"{item.Folder}")</span>
+                                            </span>
+                                            <span class="border-end me-1 pe-1">
+                                                <b><i class="mdi mdi-inbox-full-outline"></i></b>
+                                                <span class="text-muted">@($"{item.Service}")</span>
+                                            </span>
+                                            <span class="text-muted">
+                                                <b><i class="mdi mdi-calendar-month-outline"></i></b>
+                                                <span class="text-muted">@($"{item.YearStart}-{item.YearStop} гг.")</span>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/assets/libs/mark.js/jquery.mark.min.js"></script>
+    <script>
+        $("#file-content").mark($('#Query').val(),
+            {
+                each: function(node) {
+                    console.log(node);
+                    //$(node).
+                    //console.log($(node).get(0).nextSibling.remove());
+                },
+                accuracy: 'exactly',
+                //separateWordSearch: true,
+                done: function (count) {
+                    if (count === 0)
+                        return;
+                    const block = document.querySelector('#file-content');
+                    const newBlock = block.innerHTML.replace(/(<\/mark>)[^<]+(<mark)?/g,
+                        (a, b, c) => { 
+                            const str = a.replace(/<\/mark>/g, '').replace(/<mark/g, '');
+                            return `${b}${kitCut(str, 100)}${c || ''}`;
+                        }).replace(/^[^<]+(<mark)?/g, (a, b) => {
+                        const str = a.replace(/<mark/g, ''); 
+                        return `${kitCut(str, 40)}${b || ''}`;
+                    });
+                    block.innerHTML = newBlock;
+                }
+            });
+
+        $('[data-toggle="select2"]').select2({
+            width: 'resolve',
+            minimumResultsForSearch: -1
+        });
+
+        function kitCut(text, limit) {
+            text = text.trim();
+            if (text.length <= limit) return text;
+
+            text = text.slice(0, limit);
+
+            return text.trim() + " ... ";
+        }
+    </script>
+}

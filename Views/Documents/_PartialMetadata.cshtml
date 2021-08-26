@@ -1,0 +1,41 @@
+﻿@model List<AddDocumentMetadata>
+
+@if (Model.Any())
+{
+    <h4 class="header-title mb-2">Метаданные</h4>
+    <div class="row">
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var item = Model[i];
+        <div class="col-md-6 mb-3">
+            <label class="form-label">@item.Name</label>
+            <input type="hidden" value="@item.Name" name="Document.DServicesMetadata[@i].MetadataName"/>
+            @if (item.MetadataType == MetadataTypeEnum.String)
+            {
+                <input class="form-control" data-metadata-type="@item.MetadataType" placeholder="Значение" name="Document.DServicesMetadata[@i].MetadataValue" @(item.IsRequired != null && item.IsRequired.Value ? "required" : "")>
+            }
+            else if (item.MetadataType == MetadataTypeEnum.Number)
+            {
+                <input class="form-control" type="number" data-metadata-type="@item.MetadataType" placeholder="Значение" name="Document.DServicesMetadata[@i].MetadataValue" @(item.IsRequired != null && item.IsRequired.Value ? "required" : "")>
+            }
+            else if (item.MetadataType == MetadataTypeEnum.Date)
+            {
+                <input class="form-control" type="text" data-metadata-type="@item.MetadataType" placeholder="Значение" name="Document.DServicesMetadata[@i].MetadataValue" @(item.IsRequired != null && item.IsRequired.Value ? "required" : "")>
+            }
+            else if (item.MetadataType == MetadataTypeEnum.Text)
+            {
+                <textarea class="form-control" data-metadata-type="@item.MetadataType" placeholder="Значение" name="Document.DServicesMetadata[@i].MetadataValue" @(item.IsRequired != null && item.IsRequired.Value ? "required" : "")></textarea>
+            }
+        </div>
+        }
+    </div>
+}
+
+<script>
+    $('#metadata-content [data-metadata-type="Date"]').datepicker({
+        format: 'dd.mm.yyyy',
+        autoclose: true,
+        language: 'ru',
+        orientation: 'bottom'
+    });
+</script>

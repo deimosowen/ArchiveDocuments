@@ -1,0 +1,185 @@
+﻿@using Newtonsoft.Json
+@model ArchiveDocuments.Data.Entities.Models.SDocument
+@{
+    ViewData["Title"] = "Редактирование";
+    var collection = Model.SDocumentMetadata.Select(s=>new
+    {
+        s.MetadataName,
+        s.Type,
+        IsBinding = s.IsBinding.ToString().ToLower(),
+        s.MetadataLength
+    }).ToArray();
+}
+
+<div class="row">
+    <div class="offset-2 col-8">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="DocumentEdit" data-parsley-validate="" onkeydown="return event.key !== 'Enter';" autocomplete="off">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id"/>
+                    <div class="row mb-3">
+                        <div class="form-group col-8">
+                            <label asp-for="DocumentName" class="form-label">Наименование <span class="text-danger">*</span></label>
+                            <input asp-for="DocumentName" class="form-control" required="" placeholder="Наименование" />
+                        </div>
+                    </div>
+                    <h4 class="header-title mb-2">Метаданные</h4>
+                    <div id="repeater_metadata">
+                        <div class="form-group row">
+                            <div data-repeater-list="SDocumentMetadata" class="col-12">
+                                @for (var i = 0; i < collection.Length; i++)
+                                {
+                                    <div data-repeater-item="" class="form-group row mb-3">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label class="form-label">Наименование <span class="text-danger">*</span></label>
+                                                <input name="MetadataName" value="@collection[i].MetadataName" class="form-control" required="" placeholder="Наименование" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="form-label">Тип</label>
+                                                <select name="Type" class="form-select" value="@collection[i].Type">
+                                                    <option value="1">Число</option>
+                                                    <option value="2">Строка</option>
+                                                    <option value="3">Дата</option>
+                                                    <option value="4">Текст</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label class="form-label">Длина поля</label>
+                                                <input name="MetadataLength" value="@collection[i].MetadataLength" type="number" class="form-control" required="" placeholder="Длина поля" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="form-label">Обязательное</label>
+                                                <select name="IsBinding" class="form-select" value="@collection[i].IsBinding">
+                                                    <option value="false">Нет</option>
+                                                    <option value="true">Да</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="form-label">&nbsp;</label><br />
+                                                <a href="javascript:;" data-repeater-delete="" class="btn font-weight-bold btn-danger btn-icon">
+                                                    <i class="fe-delete"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                @if (!collection.Any())
+                                { 
+                                    <div data-repeater-item="" class="form-group row mb-3">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label class="form-label">Наименование <span class="text-danger">*</span></label>
+                                                <input name="MetadataName" class="form-control" required="" placeholder="Наименование" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="form-label">Тип</label>
+                                                <select name="Type" class="form-select">
+                                                    <option value="1">Число</option>
+                                                    <option value="2" selected>Строка</option>
+                                                    <option value="3">Дата</option>
+                                                    <option value="4">Текст</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label class="form-label">Длина поля</label>
+                                                <input name="MetadataLength" type="text" class="form-control" required="" placeholder="Длина поля" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="form-label">Обязательное</label>
+                                                <select name="IsBinding" class="form-select">
+                                                    <option value="false">Нет</option>
+                                                    <option value="true">Да</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="form-label">&nbsp;</label><br />
+                                                <a href="javascript:;" data-repeater-delete="" class="btn font-weight-bold btn-danger btn-icon">
+                                                    <i class="fe-delete"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col">
+                                <div data-repeater-create="" class="btn font-weight-bold btn-primary">
+                                    <i class="fe-plus me-1"></i>Добавить
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group text-end mb-0">
+                        <a asp-action="Documents" class="btn btn-secondary waves-effect">
+                            Назад
+                        </a>
+                        <button class="btn btn-success waves-effect waves-light" type="submit">
+                            Сохранить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Documents">Назад к списку</a>
+</div>
+
+@section Scripts
+{
+    <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
+    <script src="~/assets/libs/parsleyjs/i18n/ru.js"></script>
+    <script src="~/assets/libs/jquery.repeater/jquery.repeater.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('[data-parsley-validate]').parsley({
+                excluded: 'input[type=button], input[type=submit], input[type=reset]',
+                inputs: 'input, textarea, select, input[type=hidden], :hidden'
+            });
+            var $repeater = $('#repeater_metadata').repeater({
+                initEmpty: false,
+                defaultValues: {
+                    'IsBinding': 'false',
+                    'Type': '2'
+                },
+                show: function() {
+                    $(this).slideDown();
+                },
+                hide: function(deleteElement) {
+                    $(this).slideUp(deleteElement);
+
+                },
+                ready: function(setIndexes) {
+                    //$dragAndDrop.on('drop', setIndexes);
+                },
+                isFirstItemUndeletable: false,
+            });
+            $("select[value]").each(function (index) {
+                console.log($(this).attr('value'));
+                $(this).val($(this).attr('value'));
+            });
+        });
+    </script>
+}

@@ -1,0 +1,81 @@
+﻿@using ArchiveDocuments.Views.Shared.Components.NavMenuPartial
+<ul class="list-unstyled topnav-menu topnav-menu-left m-0">
+    <li class="d-block d-xl-none d-lg-none d-md-none">
+        <button class="button-menu-mobile waves-effect waves-light">
+            <i class="fe-menu"></i>
+        </button>
+    </li>
+
+    <li class="d-block d-xl-none d-lg-none d-md-none">
+        <!-- Mobile menu toggle (Horizontal Layout)-->
+        <a class="navbar-toggle nav-link" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+            <div class="lines">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </a>
+        <!-- End mobile menu toggle-->
+    </li>
+
+    <li class="d-none d-xl-block d-lg-block d-md-block">
+        <a class="nav-link waves-effect waves-light @NavMenuPartial.IndexNavClass(ViewContext)" asp-action="Index" asp-controller="Documents" role="button">
+            Документы
+        </a>
+    </li>
+    <li class="d-none d-xl-block d-lg-block d-md-block">
+        <a class="nav-link waves-effect waves-light @NavMenuPartial.SearchNavClass(ViewContext)" asp-action="Search" asp-controller="Documents" role="button">
+            Поиск
+        </a>
+    </li>
+    <li class="dropdown d-none d-xl-block d-lg-block d-md-block">
+        <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+            Справочники
+            <i class="mdi mdi-chevron-down"></i>
+        </a>
+        <div class="dropdown-menu">
+            <!-- item-->
+            <a asp-action="Employees" asp-controller="Reference" class="dropdown-item @NavMenuPartial.EmployeesNavClass(ViewContext)">
+                <i class="fe-users me-1"></i>
+                <span>Сотрудники</span>
+            </a>
+
+            <!-- item-->
+            <a asp-action="Documents" asp-controller="Reference" class="dropdown-item @NavMenuPartial.DocumentsNavClass(ViewContext)">
+                <i class="fe-file me-1"></i>
+                <span>Документы</span>
+            </a>
+        </div>
+    </li>
+</ul>
+
+<div class="topnav shadow-sm d-lg-none">
+    <div class="container-fluid">
+        <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
+            <div class="collapse navbar-collapse active" id="topnav-menu-content">
+                <ul class="navbar-nav active">
+                    <li class="nav-item">
+                        <a class="nav-link text-start @NavMenuPartial.IndexNavClass(ViewContext)" asp-action="Index" asp-controller="Documents" role="button">
+                            <i class="fe-file me-1"></i> Документы
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-start @NavMenuPartial.SearchNavClass(ViewContext)" asp-action="Search" asp-controller="Documents" role="button">
+                            <i class="fe-search me-1"></i> Поиск
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none text-start" href="#" id="topnav-dashboard" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fe-airplay me-1"></i> Справочники
+                            <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-dashboard">
+                            <a asp-action="Employees" asp-controller="Reference" class="dropdown-item @NavMenuPartial.EmployeesNavClass(ViewContext)">Сотрудники</a>
+                            <a asp-action="Documents" asp-controller="Reference"  class="dropdown-item @NavMenuPartial.DocumentsNavClass(ViewContext)">Документы</a>
+                        </div>
+                    </li>
+                </ul> <!-- end navbar-->
+            </div> <!-- end .collapsed-->
+        </nav>
+    </div> <!-- end container-fluid -->
+</div>

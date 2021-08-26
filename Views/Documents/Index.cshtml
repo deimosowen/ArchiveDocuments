@@ -1,0 +1,48 @@
+﻿
+@section Style{
+    <link href="~/assets/libs/tree_gpl/tree.min.css" rel="stylesheet" type="text/css" />
+}
+@{
+    ViewData["Title"] = "Документы";
+}
+<div class="row">
+    <div class="col-8 offset-2">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-lg-4 offset-8">
+                        <div class="text-lg-end">
+                            <a asp-action="AddDocument" type="button" class="btn btn-success waves-effect waves-light mb-2 me-2"><i class="mdi mdi-plus me-1"></i> Добавить документ</a>
+                        </div>
+                    </div><!-- end col-->
+                    <div>
+                        <div id="tree-documents"></div>
+                    </div>
+                </div>
+            </div> <!-- end card-body-->
+        </div> <!-- end card-->
+    </div> <!-- end col -->
+</div>
+
+@section Scripts{
+    <script src="~/assets/libs/tree_gpl/tree.min.js"></script>
+    <script>
+        var data = new dhx.TreeCollection();
+        data.load("/Documents/GetTreeDocuments");
+        var tree = new dhx.Tree("tree-documents", {
+            data: data
+        });
+
+        tree.events.on('itemClick', function (val) {
+            var selected = data._pull[val];
+            if (!selected.items) 
+                window.open(`/Documents/View/${selected.id}`, '_blank');
+            
+        });
+        tree.events.on('itemDblClick', function (val) {
+            var selected = data._pull[val];
+            if (selected.items)
+                tree.expand(val);
+        });
+    </script>
+}

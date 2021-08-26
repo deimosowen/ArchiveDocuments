@@ -1,0 +1,112 @@
+﻿@{
+    ViewData["Title"] = "Сотрудники";
+}
+
+@section Style
+{
+    <link href="~/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        div.dataTables_wrapper div.dataTables_filter {
+            text-align: left !important;
+        }
+    </style>
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="employees-datatable" class="table nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>
+                                Наименование
+                            </th>
+                            <th>
+                                Организация
+                            </th>
+                            <th>
+                                Статус
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="~/assets/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $("#employees-datatable").DataTable({
+                "sDom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'<'toolbar text-end mb-1'>>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                processing: true,
+                serverSide: true,
+                pageLength: 10,
+                searchDelay: 1000,
+                ordering: false,
+                ajax: {
+                    url: "GetEmployeesJson",
+                    type: "POST",
+                    datatype: "json"
+                },
+                columns: [
+                    { data: "employeesName" },
+                    { data: "organizationName" },
+                    {
+                        data: "isLock",
+                        render: function(data, type, row) {
+                            return data ? `<span class="badge badge-soft-success">Активен</span>` :`<span class="badge badge-soft-danger">Не активен</span>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        class: "text-end py-1",
+                        render: function(data, type, row) {
+                            return `
+                                        <a href="EmployeeEdit/${row.id}" class="action-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Редактировать"><i class="mdi mdi-pencil text-info"></i></a>
+                                        <form class="d-inline-flex" action="/Reference/EmployeeDelete/${row.id}" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn action-icon" data-toggle="remove" data-bs-toggle="tooltip" type="button" data-bs-placement="bottom" title="Удалить"><i class="mdi mdi-trash-can-outline text-danger"></i></button>
+                                        </form>`;
+                        }
+                    }
+                ],
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/Russian.json',
+                    paginate: {
+                        previous: "<i class='mdi mdi-chevron-left'>",
+                        next: "<i class='mdi mdi-chevron-right'>"
+                    }
+                },
+                drawCallback: function() {
+                    $(".dataTables_paginate > .pagination").addClass("pagination");
+                    $("div.toolbar").html('<a class="btn btn-primary" href="EmployeeCreate"><i class="mdi mdi-plus me-2"></i> Добавить</a>');
+                    $("#basic-datatable_filter input").removeClass('form-control-sm');
+                    $('[data-toggle="remove"], [data-bs-toggle="tooltip"]').tooltip({ trigger: 'hover' });
+                }
+            });
+        });
+    </script>
+}

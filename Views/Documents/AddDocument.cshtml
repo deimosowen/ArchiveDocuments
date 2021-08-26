@@ -1,0 +1,402 @@
+﻿@using System.Linq
+@model AddDocumentRequestModel
+@section Style
+{
+    <link type="text/css" rel="stylesheet" href="~/assets/libs/scanner.js/dist/scanner.css" />
+    <link type="text/css" rel="stylesheet" href="~/assets/libs/magnific-popup/magnific-popup.css" />
+    <link type="text/css" rel="stylesheet" href="~/assets/libs/ladda/ladda.min.css" />
+}
+@{
+    ViewData["Title"] = "Добавление документа";
+}
+
+<div class="row">
+    <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-2">Основная информация</h4>
+                <form method="post" action="/Documents/AddDocument" id="add-document-form">
+                    <input asp-for="Document.DServices.YearStart" type="hidden" value="@DateTime.Today.Year" />
+                    <input asp-for="Document.DServices.YearStop" type="hidden" value="@DateTime.Today.Year" />
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Document.DServices.DFolder.SOrganizationId" class="form-label">Организация</label>
+                            <select asp-for="Document.DServices.DFolder.SOrganizationId" style="width: 100%;" class="form-control" asp-items="Model.OrganizationList" data-toggle="select2" required>
+                                <option value="">Выберите огранизацию</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Document.DServices.SDocumentId" class="form-label">Документ</label>
+                            <select asp-for="Document.DServices.SDocumentId" style="width: 100%;" class="form-control" asp-items="Model.DocumentList" data-toggle="select2" required>
+                                <option value="">Выберите документ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Document.DServices.DFolder.FolderName" class="form-label">Папка</label>
+                            <div class="input-group">
+                                <select asp-for="Document.DServices.DFolderId" class="form-control" data-toggle="select2" placeholder="Папка" disabled="" required>
+                                    <option value="">Выберите папку</option>
+                                </select>
+                                <a asp-action="AddDocumentFolderModal" id="addFolder" class="disabled input-group-text btn waves-effect waves-light btn-blue"><i class="fa fa-plus"></i></a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Document.DServices.CaseNumber" class="form-label">Дело</label>
+                            <div class="input-group">
+                                <select asp-for="Document.DServicesId" class="form-control" data-toggle="select2" placeholder="Папка" disabled="" required>
+                                    <option value="">Выберите дело</option>
+                                </select>
+                                <a asp-action="AddDocumentServiceModal" id="addService" class="input-group-text btn waves-effect disabled waves-light btn-blue"><i class="fa fa-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Document.Description" class="form-label">Описание</label>
+                            <textarea asp-for="Document.Description" class="form-control" placeholder="Описание документа" required></textarea>
+                        </div>
+                    </div>
+
+                    <div id="metadata-content"></div>
+
+                    <h4 class="header-title mb-2">Документы</h4>
+                    <div class="mb-2 row">
+                        <div class="col-3">
+                            <button id="startScan" type="button" onclick="scanToJpg();" class="btn btn-info btn-sm">Сканировать</button>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check form-check-success form-switch">
+                                <input type="checkbox" class="form-check-input" id="textRecognising" checked="checked" name="textRecognising" value="true">
+                                <label title="Использовать нейронную сеть для распознавания текста отсканированных документов. Точности оптического распознавания текста 99,8%" tabindex="0" data-plugin="tippy" data-tippy-arrow="true" data-tippy-animation="fade" class="form-check-label" for="textRecognising" style="border-bottom: 1px dotted #8f9396 !important; cursor: help;">Распознавание текста</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="scan-content" class="mb-2 row"></div>
+
+                    <div>
+                        <input type="submit" class="btn btn-success" value="Сохранить">
+                    </div>
+                </form>
+            </div> <!-- end card-body -->
+        </div> <!-- end card -->
+    </div><!-- end col -->
+</div>
+
+@section Scripts
+{
+    <script src="~/assets/libs/scanner.js/dist/scanner.js" type="text/javascript"></script>
+    <script src="~/assets/libs/magnific-popup/jquery.magnific-popup.min.js" type="text/javascript"></script>
+    <script src="~/assets/libs/ladda/spin.min.js" type="text/javascript"></script>
+    <script src="~/assets/libs/ladda/ladda.min.js" type="text/javascript"></script>
+
+    <script>
+        $('[data-toggle="select2"]').select2({
+           // width: 'resolve',
+            minimumResultsForSearch: -1
+        }).on('change',
+            function () {
+                const $this = $(this);
+                $this.children("option[value='']").remove();
+            });
+        $('#Services_DateStart').datepicker().on('changeDate',
+            function (e) {
+                const year = moment($('#Services_DateStart').datepicker("getDate")).format("YYYY");
+                $('#Document_DServices_YearStart').val(year);
+            });
+        $('#Services_DateStop').datepicker().on('changeDate',
+            function (e) {
+                const year = moment($('#Services_DateStop').datepicker("getDate")).format("YYYY");
+                $('#Document_DServices_YearStop').val(year);
+            });
+        $('#Document_DServices_SDocumentId').on('change',
+            function () {
+                const id = this.value,
+                    $content = $('#metadata-content');
+                $.ajax({
+                    type: 'GET',
+                    url: '/Documents/GetMetadataReference',
+                    data: { id: id },
+                    beforeSend: function () {
+                        $content.empty();
+                    },
+                    success: function (content) {
+                        $content.html(content);
+                    }
+                });
+            });
+        $("#Document_DServices_DFolder_SOrganizationId").on('change',
+            function () {
+                $('#addFolder').removeClass('disabled');
+                $.ajax({
+                    type: 'GET',
+                    url: '/Documents/GetFolderReference',
+                    data: { id: $("#Document_DServices_DFolder_SOrganizationId").val() },
+                    beforeSend: function () {
+                        $("#Document_DServices_DFolderId option").remove();
+                        $('#Document_DServices_DFolderId').prop('disabled', true);
+                    },
+                    success: function (data) {
+                        if (!data.length) {
+                            $('#Document_DServices_DFolderId').append(new Option('Нет папок', '', false, true));
+                            return;
+                        }
+                        $('#Document_DServices_DFolderId').prop('disabled', false);
+                        $('#Document_DServices_DFolderId').append(new Option('Выберите папку', '', false, true));
+
+                        $.each(data,
+                            function (index, value) {
+                                $('#Document_DServices_DFolderId').append(new Option(value.text, value.value, false, false));
+                            });
+                        // $('#Document_DServices_DFolder_FolderName').trigger('change');
+                    }
+                });
+            });
+        $("#Document_DServices_SDocumentId, #Document_DServices_DFolderId").on('change',
+            function () {
+                var docId = $("#Document_DServices_SDocumentId").val(),
+                    folderId = $("#Document_DServices_DFolderId").val();
+
+                if (docId === '' || folderId === '') {
+                    $('#addService').addClass('disabled');
+                    return;
+                }
+                $('#addService').removeClass('disabled');
+                $.ajax({
+                    type: 'GET',
+                    url: '/Documents/GetServicesReference',
+                    data: {
+                        folderId: folderId,
+                        documentId: docId
+                    },
+                    beforeSend: function () {
+                        $("#Document_DServicesId option").remove();
+                        $('#Document_DServicesId').prop('disabled', true);
+                    },
+                    success: function (data) {
+                        if (!data.length) {
+                            $('#Document_DServicesId').append(new Option('Нет дел', '', false, true));
+                            return;
+                        }
+                        $('#Document_DServicesId').prop('disabled', false);
+                        $('#Document_DServicesId').append(new Option('Выберите дело', '', false, true));
+
+                        $.each(data,
+                            function (index, value) {
+                                $('#Document_DServicesId').append(new Option(value.text, value.value, false, false));
+                            });
+                        // $('#Document_DServices_DFolder_FolderName').trigger('change');
+                    }
+                });
+            });
+        $('#addFolder').on('click',
+            function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $.ajax({
+                    url: $(this).attr('href'),
+                    data: {
+                        id: $("#Document_DServices_DFolder_SOrganizationId").val()
+                    },
+                    success: (data) => {
+                        createModal({
+                            content: data,
+                            id: 'add-folder',
+                            backdrop: false
+                        });
+                    },
+                    error: (data, textStatus) => {
+                    }
+                });
+            });
+        $('#addService').on('click',
+            function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var docId = $("#Document_DServices_SDocumentId").val(),
+                    folderId = $("#Document_DServices_DFolderId").val();
+
+                $.ajax({
+                    url: $(this).attr('href'),
+                    data: {
+                        folderId: folderId,
+                        documentId: docId
+                    },
+                    success: (data) => {
+                        createModal({
+                            content: data,
+                            id: 'add-service',
+                            backdrop: false
+                        });
+                    },
+                    error: (data, textStatus) => {
+                    }
+                });
+            });
+    </script>
+
+    <script>
+        var startScanButton = Ladda.create(document.getElementById('startScan'));
+        $("#add-document-form").submit(function (e) {
+            e.preventDefault();
+            var formAction = $(this).attr("action"),
+                formDataToUpload = new FormData(this);
+            formDataToUpload.append('__RequestVerificationToken', $('[name="__RequestVerificationToken"]').val());
+            $('[data-scan-item]').each(function () {
+                var ImageURL = $(this).find('[name="imgCollection"]').attr('src');
+                var block = ImageURL.split(";");
+                var contentType = block[0].split(":")[1];
+                var realData = block[1].split(",")[1];
+                var blob = b64toBlob(realData, contentType);
+                formDataToUpload.append("fileCollection", blob, `${$(this).find('[name="imgNameCollection"]').val()}.jpg`);
+            });
+            $.ajax({
+                method: 'POST',
+                processData: false,
+                contentType: false,
+                url: formAction,
+                data: formDataToUpload,
+                beforeSend: function () {
+                    $('#add-document-form input[type="submit"]').prop('disabled', true);
+                },
+                success: function (data) {
+                    document.location.href = `/Documents/View/${data.id}`;
+                }
+            });
+            return false;
+        });
+
+        function scanToJpg() {
+            startScanButton.start();
+            scanner.scan(displayImagesOnPage,
+                {
+                    "use_asprise_dialog": false,
+                    "output_settings": [
+                        {
+                            "type": "return-base64-thumbnail",
+                            "format": "jpg",
+                            "thumbnail_height": 200
+                        },
+                        {
+                            "type": "return-base64",
+                            "format": "jpg"
+                        }
+                    ],
+                    "i18n": {
+                        "lang": "ru"
+                    }
+                }
+            );
+        }
+
+        /** Processes the scan result */
+        function displayImagesOnPage(successful, mesg, response) {
+            if (!successful) {
+                console.error('Failed: ' + mesg);
+                startScanButton.stop();
+                return;
+            }
+            if (successful && mesg != null && mesg.toLowerCase().indexOf('user cancel') >= 0) {
+                console.info('User cancelled');
+                startScanButton.stop();
+                return;
+            }
+            var scannedImages = scanner.getScannedImages(response, true, false); // returns an array of ScannedImage
+            for (var i = 0; (scannedImages instanceof Array) && i < scannedImages.length; i++) {
+                var scannedImage = scannedImages[i];
+                processScannedImage(scannedImage);
+            }
+            startScanButton.stop();
+        }
+
+        /** Images scanned so far. */
+        var imagesScanned = [];
+
+        /** Processes a ScannedImage */
+        function processScannedImage(scannedImage) {
+            if (!$('#scan-content img').length) $('#scan-content').empty();
+            $('#scan-content').append($('<div>',
+                {
+                    class: 'col-sm-6 col-xl-3',
+                    append: $('<div>',
+                        {
+                            class: 'gal-box',
+                            'data-scan-item': '',
+                            append: [
+                                $('<a>',
+                                    {
+                                        class: 'image-popup',
+                                        title: 'Изображение',
+                                        href: scannedImage.src,
+                                        append: $('<img>',
+                                            {
+                                                class: 'img-fluid',
+                                                name: 'imgCollection',
+                                                src: scannedImage.src
+                                            })
+                                    }), $('<div>',
+                                        {
+                                            class: 'gall-info',
+                                            append: $('<input>',
+                                                {
+                                                    type: 'text',
+                                                    class: 'form-control-sm form-control',
+                                                    name: 'imgNameCollection',
+                                                    value: 'Изображение',
+                                                    on: {
+                                                        change: (e) => {
+                                                            $(e.target).closest('[data-scan-item]').children('a').attr('title', e.target.value);
+                                                        }
+                                                    }
+                                                })
+                                        })
+                            ],
+                        })
+                }));
+            $('.image-popup').magnificPopup({
+                type: 'image',
+                closeOnContentClick: false,
+                closeBtnInside: false,
+                mainClass: 'mfp-with-zoom mfp-img-mobile',
+                image: {
+                    verticalFit: true,
+                    titleSrc: function (item) {
+                        return item.el.attr('title');
+                    }
+                },
+                gallery: {
+                    enabled: true
+                },
+                zoom: {
+                    enabled: true,
+                    duration: 300, // don't foget to change the duration also in CSS
+                    opener: function (element) {
+                        return element.find('img');
+                    }
+                }
+            });
+        }
+
+        function b64toBlob(b64Data, contentType, sliceSize) {
+            contentType = contentType || '';
+            sliceSize = sliceSize || 512;
+            var byteCharacters = atob(b64Data);
+            var byteArrays = [];
+            for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                var slice = byteCharacters.slice(offset, offset + sliceSize);
+                var byteNumbers = new Array(slice.length);
+                for (var i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+                var byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+            var blob = new Blob(byteArrays, { type: contentType });
+            return blob;
+        }
+    </script>
+}

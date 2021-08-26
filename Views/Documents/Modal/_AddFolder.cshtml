@@ -1,0 +1,45 @@
+﻿@model ArchiveDocuments.Data.Entities.Models.DFolder
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">
+            <form asp-action="AddDocumentFolder" class="parsley-examples" id="form-folder">
+                <input type="hidden" asp-for="SOrganizationId" />
+                <div class="row">
+                    <div class="col-12 mb-2">
+                        <label asp-for="FolderName" class="form-label">Название папки <span class="text-danger">*</span></label>
+                        <input asp-for="FolderName" required placeholder="Введите название" class="form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Закрыть</button>
+            <button type="submit" form="form-folder" class="btn btn-success">Сохранить</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div>
+
+<script>
+    $("#form-folder").submit(function (e) {
+        e.preventDefault();
+        var formAction = $(this).attr("action");
+        var fdata = $(this).serialize();
+        //if ($(this).parsley().validate()) { }
+            $.ajax({
+                type: 'POST',
+                url: formAction,
+                data: fdata,
+                beforeSend: function () {
+                    $('#add-folder button[type="submit"]').prop('disabled', true);
+                }
+            }).done(function (result) {
+                $.NotificationApp.send("Готово!", "Запись успешно добавлена.", 'top-right', '#5ba035', 'success');
+                $('#Document_DServices_DFolderId').append(new Option(result.name, result.id, false, true)).trigger('change');
+                $('#Document_DServices_DFolderId').prop('disabled', false);
+                $('#add-folder').modal('hide');
+            });
+      
+        return false;
+    });
+</script>

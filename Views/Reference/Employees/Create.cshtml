@@ -1,0 +1,125 @@
+﻿@model ArchiveDocuments.Data.Entities.ApplicationUser
+@{
+    ViewData["Title"] = "Добавление";
+}
+
+<div class="row">
+    <div class="offset-2 col-8">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="EmployeeCreate" data-parsley-validate="" onkeydown="return event.key !== 'Enter';" autocomplete="off">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row mb-3">
+                        <div class="form-group col-8">
+                            <label asp-for="EmployeesName" class="form-label">ФИО <span class="text-danger">*</span></label>
+                            <input asp-for="EmployeesName" class="form-control" required="" placeholder="Магомедов Магомед" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="form-group col-4">
+                            <label asp-for="UserName" class="form-label">Логин <span class="text-danger">*</span></label>
+                            <input asp-for="UserName" class="form-control" required="" autocomplete="off" data-parsley-username="" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-4">
+                            <label asp-for="PasswordHash" class="form-label">Пароль <span class="text-danger">*</span></label>
+                            <input asp-for="PasswordHash" type="password" class="form-control" required="" autocomplete="off" />
+                            <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="form-group col-4">
+                            <label asp-for="SOrganizationId" class="form-label">Организация</label>
+                            <select asp-for="SOrganizationId" class="form-control" data-toggle="select2" asp-items="ViewBag.OrganizationList"></select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="form-group col-4">
+                            <label asp-for="PhoneNumber" class="form-label">Номер телефона</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-4">
+                            <label asp-for="Email" class="form-label">Электронная почта <span class="text-danger">*</span></label>
+                            <input asp-for="Email" class="form-control" placeholder="mail@mail.ru" required="" data-parsley-email="" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group text-end mb-0">
+                        <a asp-action="Employees" class="btn btn-secondary waves-effect">
+                            Назад
+                        </a>
+                        <button class="btn btn-success waves-effect waves-light" type="submit">
+                            Сохранить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Employees">Назад к списку</a>
+</div>
+
+@section Scripts
+{
+    <script src="~/assets/libs/parsleyjs/parsley.min.js"></script>
+    <script src="~/assets/libs/parsleyjs/i18n/ru.js"></script>
+    <script src="~/assets/libs/jquery-mask-plugin/jquery.mask.min.js"></script>
+    <script src="~/assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/assets/libs/bootstrap-datepicker/locales/bootstrap-datepicker.ru.min.js"></script>
+
+    <script>
+        Parsley.addValidator('username', {
+            validateString: function (value) {
+                let result = false;
+                $.ajax({
+                    url: "CheckValid",
+                    type: "POST",
+                    async: false,
+                    data: {
+                        id: null,
+                        userName: value
+                    },
+                    success: function (response) {
+                        result = response.valid;
+                    }
+                });
+                return result;
+            },
+            messages: { ru: 'Логин уже используется' }
+        });
+        Parsley.addValidator('email', {
+            validateString: function (value) {
+                let result = false;
+                $.ajax({
+                    url: "CheckValid",
+                    type: "POST",
+                    async: false,
+                    data: {
+                        id: null,
+                        email: value
+                    },
+                    success: function (response) {
+                        result = response.valid;
+                    }
+                });
+                return result;
+            },
+            messages: { ru: 'Электронная почта уже используется' }
+        });
+        $(document).ready(function () {
+            $('[data-parsley-validate]').parsley({
+                excluded: 'input[type=button], input[type=submit], input[type=reset]',
+                inputs: 'input, textarea, select, input[type=hidden], :hidden',
+            });
+            $('[data-toggle="select2"]').select2({
+                minimumResultsForSearch: -1
+            });
+            $('#PhoneNumber').mask('+7(000)000-00-00', { clearIfNotMatch: true, placeholder: "+7(000)000-00-00" });
+        });
+    </script>
+}

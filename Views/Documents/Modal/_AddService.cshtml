@@ -1,0 +1,71 @@
+﻿@model ArchiveDocuments.Data.Entities.Models.DService
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">
+            <form asp-action="AddDocumentService" class="parsley-examples" id="form-service">
+                <input type="hidden" asp-for="DFolderId" />
+                <input type="hidden" asp-for="SDocumentId" />
+                <div class="row">
+                    <div class="col-12 mb-2">
+                    <label asp-for="CaseNumber" class="form-label">Номер дела <span class="text-danger">*</span></label>
+                    <input asp-for="CaseNumber" required placeholder="Введите номер дела" class="form-control">
+                </div>
+                    <div class="col-6 mb-2">
+                        <label asp-for="CountPage" class="form-label">Кол-во страниц <span class="text-danger">*</span></label>
+                        <input asp-for="CountPage" type="number" required placeholder="0" class="form-control" value="1">
+                    </div>
+                    <div class="form-group col-6">
+                        <label asp-for="YearStart" class="form-label">Период</label>
+                        <div class="input-group input-daterange">
+                            <input type="text" id="Services_DateStart" name="YearStart" data-toggle="datepicker" value="@DateTime.Today.Year" class="form-control" required />
+                            <div class="input-group-addon input-group-text px-2">по</div>
+                            <input type="text" id="Services_DateStop" name="YearStop" data-toggle="datepicker" value="@DateTime.Today.Year" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <label asp-for="Description" class="form-label">Описание<span class="text-danger">*</span></label>
+                        <textarea asp-for="Description" required placeholder="Введите описание" class="form-control"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Закрыть</button>
+            <button type="submit" form="form-service" class="btn btn-success">Сохранить</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div>
+
+<script>
+    $('#form-service .input-daterange').datepicker({
+        format: 'yyyy',
+        autoclose: true,
+        language: 'ru',
+        orientation: 'bottom',
+        viewMode: "years",
+        minViewMode: "years"
+    });
+    $("#form-service").submit(function (e) {
+        e.preventDefault();
+        var formAction = $(this).attr("action");
+        var fdata = $(this).serialize();
+        //if ($(this).parsley().validate()) { }
+        $.ajax({
+            type: 'POST',
+            url: formAction,
+            data: fdata,
+            beforeSend: function () {
+                $('#add-service button[type="submit"]').prop('disabled', true);
+            }
+        }).done(function (result) {
+            $.NotificationApp.send("Готово!", "Запись успешно добавлена.", 'top-right', '#5ba035', 'success');
+            $('#Document_DServicesId').append(new Option(result.name, result.id, false, true)).trigger('change');
+            $('#Document_DServicesId').prop('disabled', false);
+
+            $('#add-service').modal('hide');
+        });
+      
+        return false;
+    });
+</script>
