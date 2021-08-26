@@ -1,0 +1,128 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Вход в систему";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Архив</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+
+        .btn-login {
+            -webkit-box-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            justify-content: center;
+            font-weight: 400;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            line-height: 1.5;
+            user-select: none;
+            border: 1px solid rgb(4, 40, 147);
+            transition: color 0.15s ease-in-out 0s, background-color 0.15s ease-in-out 0s, border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+            color: rgb(255, 255, 255);
+            background-color: rgb(4, 40, 147);
+            padding: 0.46875rem 0.9375rem;
+            font-size: 0.875rem;
+            display: block;
+            width: 100%;
+            border-radius: 0.25rem;
+        }
+        .btn-login:hover, .btn-login:active, .btn-login:focus {
+            border-color: rgb(6, 60, 221);
+            background-color: rgb(6, 60, 221);
+            color: rgb(255, 255, 255);
+            box-shadow: none;
+        }
+
+        body {
+            /* Margin bottom by footer height */
+            margin-bottom: 0px;
+        }
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            white-space: nowrap;
+            /* Set the fixed height of the footer here */
+            height: 50px;
+            line-height: 48px; /* Vertically center the text there */
+        }
+        main {
+            min-height: calc(100vh - 50px) !important;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <main role="main" class="pb-3">
+        <div class="row">
+            <div class="col-md-8">
+                <section>
+                    <div style="width: 600px;">
+                        <img src="~/assets/images/img15.7466a766.png" alt="Login" style="border: 0px;vertical-align: middle; max-width: 100%;">
+                    </div>
+                </section>
+            </div>
+            <div class="col-md-4">
+                <section>
+                    <h2>Архив</h2>
+                    <h5>@ViewData["Title"]</h5>
+                    <p style="font-size: 16px; color: rgb(131, 146, 165);">Добро пожаловать обратно! Пожалуйста, войдите, чтобы продолжить.</p>
+                    <form id="account" method="post">
+                        <hr class="my-4" />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="Input.UserName">Логин</label>
+                            <input asp-for="Input.UserName" class="form-control" autocomplete="username" aria-required="true" />
+                            <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Password">Пароль</label>
+                            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label asp-for="Input.RememberMe">
+                                    <input asp-for="Input.RememberMe" />
+                                    @Html.DisplayNameFor(m => m.Input.RememberMe)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-login">Войти</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+</div>
+<footer class="footer border-top text-muted">
+    <div class="container">
+        &copy; 2021 - Архив - <a href="https://websystems.me/" target="_blank">WebSystems</a>
+    </div>
+</footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>
+
+
+
