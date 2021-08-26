@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery.repeater@1.2.1",
+      "destination": "wwwroot/assets/libs/jquery.repeater/"
+    },
+    {
+      "library": "lightbox2@2.11.3",
+      "destination": "wwwroot/assets/libs/lightbox2/"
+    },
+    {
+      "library": "mark.js@8.11.1",
+      "destination": "wwwroot/assets/libs/mark.js/"
+    }
+  ]
+}

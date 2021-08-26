@@ -1,0 +1,1 @@
+﻿Scaffold-DbContext 'Host=192.168.35.40;Port=5432;Database=Archive;Username=postgres;Password=!ShamiL19' -OutputDir Data\Entities\Models Npgsql.EntityFrameworkCore.PostgreSQL -ContextDir Data\Concrete -Context ArchiveContext -Force -NoOnConfiguring

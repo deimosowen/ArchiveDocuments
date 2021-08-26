@@ -1,0 +1,127 @@
+﻿
+.list-unstyled .notification-list {
+    height: 65px !important;
+}
+
+.list-unstyled .notification-list a {
+    height: 65px !important;
+    display: flex !important;
+    align-items: center;
+} 
+
+.nav-user .pro-user-img {
+    width: 35px;
+    height: 35px;
+    background-color: #8E8E8E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+}
+
+.nav-user .pro-user-img span {
+    color: #fff;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.nav-user .pro-user-name {
+    font-size: 13px;
+    color: #CECCCC;
+    display: flex;
+    align-items: center;
+    padding-left: 3px;
+}
+
+.nav-user .pro-user-name i {
+    font-size: 12px;
+    margin-top: 2px;
+    color: #BCBCBD;
+    padding-left: 5px;
+}
+
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+@media (max-width: 991.98px) {
+ .content-page, body[data-sidebar-size=condensed] .content-page {
+                                  padding-right: 10px;
+                                  padding-left: 10px;
+                                  padding-top: 55px; 
+                              }
+}
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px; /* Vertically center the text there */
+}
+
+.input-group > .select2-container--default {
+    width: auto;
+    flex: 1 1 auto;
+}
+
+.input-group > .select2-container--default .select2-selection--single {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
