@@ -1,9 +1,6 @@
 ﻿using ArchiveDocuments.Data.Entities.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ArchiveDocuments.Models
 {
@@ -20,14 +17,6 @@ namespace ArchiveDocuments.Models
         public bool? IsRequired { get; internal set; }
         public string Length { get; internal set; }
         public string Name { get; internal set; }
-        public MetadataTypeEnum MetadataType { get; internal set; }
-    }
-
-    public enum MetadataTypeEnum
-    {
-        Number = 1,
-        String = 2,
-        Date = 3,
-        Text = 4
+        public MetadataType MetadataType { get; internal set; }
     }
 }

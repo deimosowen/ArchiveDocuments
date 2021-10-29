@@ -1,18 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using ArchiveDocuments.Data.Concrete;
+﻿using ArchiveDocuments.Data.Concrete;
 using ArchiveDocuments.Data.Entities;
 using ArchiveDocuments.Data.Entities.Models;
 using ArchiveDocuments.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ArchiveDocuments.Controllers
 {
@@ -76,8 +72,6 @@ namespace ArchiveDocuments.Controllers
             var user = await _userManager.CreateAsync(applicationUser, applicationUser.PasswordHash);
             
             await _userManager.AddToRoleAsync(applicationUser, "user");
-
-            //await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Employees), new { actionStatus = ActionStatus.AddSuccess });
         }
 
@@ -118,10 +112,10 @@ namespace ArchiveDocuments.Controllers
         {
             if (!string.IsNullOrWhiteSpace(userName))
                 return Json(new { valid = !_context.AspNetUsers.Any(a => a.UserName == userName) });
+
             if (!string.IsNullOrWhiteSpace(email))
-            {
                 return Json(new { valid = !_context.AspNetUsers.Any(a => a.Email == email && a.Id != id) });
-            }
+
             return Json(new { valid = true });
         }
         #endregion
@@ -234,6 +228,7 @@ namespace ArchiveDocuments.Controllers
 
                 if (document.SDocumentMetadata.Any()) 
                     _context.RemoveRange(document.SDocumentMetadata);
+
                 _context.Remove(document);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Documents), new { actionStatus = ActionStatus.DeleteSuccess });

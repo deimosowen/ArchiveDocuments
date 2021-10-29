@@ -38,7 +38,8 @@ namespace ArchiveDocuments
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddControllersWithViews();
-            services.AddRazorPages();
+            services.AddRazorPages()
+                    .AddRazorRuntimeCompilation();
             services.Configure<FtpSettingsModel>(Configuration.GetSection("FtpSettings"));
             services.AddTransient<IFtpService, FtpService>();
         }

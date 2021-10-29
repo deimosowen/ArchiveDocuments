@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ArchiveDocuments.Models
 {
     public class TreeModel
     {
+        public TreeModel(Guid id, string value, IEnumerable<TreeModel> items = null, bool opened = false)
+        {
+            Id = id;
+            Value = value;
+            Opened = opened;
+            Items = items;
+            
+        }
+
         public Guid Id { get; internal set; }
         public string Value { get; internal set; }
         public bool Opened { get; internal set; }
-        public List<TreeModel> Items { get; internal set; }
-        public object Icon { get; set; }
+        public IEnumerable<TreeModel> Items { get; internal set; }
     }
 }

@@ -39,6 +39,11 @@ namespace ArchiveDocuments.Models
 
     public class DocumentMetadata
     {
+        public DocumentMetadata(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
         public string Name { get; internal set; }
         public string Value { get; internal set; }
     }

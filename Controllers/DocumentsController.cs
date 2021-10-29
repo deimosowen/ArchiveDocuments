@@ -1,20 +1,19 @@
 ﻿using ArchiveDocuments.Data.Concrete;
+using ArchiveDocuments.Data.Entities.Models;
 using ArchiveDocuments.Models;
+using ArchiveDocuments.Services;
+using IronOcr;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NinjaNye.SearchExtensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using ArchiveDocuments.Data.Entities.Models;
-using ArchiveDocuments.Services;
-using IronOcr;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using NinjaNye.SearchExtensions;
 
 namespace ArchiveDocuments.Controllers
 {
@@ -37,50 +36,16 @@ namespace ArchiveDocuments.Controllers
 
         public IEnumerable<TreeModel> GetTreeDocuments()
         {
-            return _context.SOrganizations.Select(org => new TreeModel
-            {
-                Id = org.Id,
-                Value = org.OrganizationName,
-                Icon = new
-                {
-                    Folder = "dxi dxi-folder",
-                    OpenFolder = "dxi dxi-folder-open",
-                    File = "dxi dxi-folder"
-                },
-                Items = org.DFolders.Select(folder => new TreeModel
-                {
-                    Id = folder.Id,
-                    Value = folder.FolderName,
-                    Icon = new
-                    {
-                        Folder = "dxi dxi-folder",
-                        OpenFolder = "dxi dxi-folder-open",
-                        File = "dxi dxi-folder"
-                    },
-                    Items = folder.DServices.Select(service => new TreeModel
-                    {
-                        Id = service.Id,
-                        Value = service.CaseNumber,
-                        Icon = new
-                        {
-                            Folder = "dxi dxi-folder",
-                            OpenFolder = "dxi dxi-folder-open",
-                            File = "dxi dxi-folder"
-                        },
-                        Items = service.DServicesDocuments.Select(doc => new TreeModel
-                        {
-                            Id = doc.Id,
-                            Value = doc.Description,
-                            Icon = new
-                            {
-                                Folder = "dxi dxi-folder",
-                                OpenFolder = "dxi dxi-folder-open",
-                                File = "dxi dxi-file-outline"
-                            },
-                        }).ToList(),
-                    }).ToList()
-                }).ToList()
-            }).AsParallel().ToArray();
+            var data = _context.SOrganizations
+                .Include(i => i.DFolders)
+                .ThenInclude(i => i.DServices)
+                .ThenInclude(i => i.DServicesDocuments).AsNoTracking().ToList();
+
+            //TODO переделать
+            return data.Select(org => new TreeModel(org.Id, org.OrganizationName, 
+                   org.DFolders.Select(folder => new TreeModel(folder.Id, folder.FolderName,
+                   folder.DServices.Select(service => new TreeModel(service.Id, service.CaseNumber,
+                   service.DServicesDocuments.Select(doc => new TreeModel(doc.Id, doc.Description))))))));
         }
 
         public IActionResult Search(string query, Guid? organizationId, Guid? documentId)
@@ -98,8 +63,8 @@ namespace ArchiveDocuments.Controllers
                     new SelectList(
                         _context.SDocuments.AsNoTracking().Select(s => new { Name = s.DocumentName, Id = s.Id }), "Id",
                         "Name", documentId),
-                Documents = !string.IsNullOrEmpty(query)
-                    ? _context.DServicesDocuments.AsNoTracking()
+                Documents = string.IsNullOrEmpty(query) ? new List<DocumentsModel>() :
+                    _context.DServicesDocuments.AsNoTracking()
                         .Where(w => !documentId.HasValue || w.DServices.SDocumentId == documentId)
                         .Select(s => new DocumentsModel
                         {
@@ -111,22 +76,20 @@ namespace ArchiveDocuments.Controllers
                             Service = s.DServices.CaseNumber,
                             YearStart = s.DServices.YearStart,
                             YearStop = s.DServices.YearStop,
-                            Metadata = s.DServicesMetadata.Select(ss => new DocumentMetadata
-                                { Name = ss.MetadataName, Value = ss.MetadataValue }),
-                            FileContent = string.Join(' ', s.DServicesDocumentFiles.Select(ss=>ss.FileContent))
+                            Metadata = s.DServicesMetadata.Select(ss => new DocumentMetadata(ss.MetadataName, ss.MetadataValue)),
+                            FileContent = string.Join(' ', s.DServicesDocumentFiles.Select(ss => ss.FileContent))
                         }).ToList()
                         .Search(s => s.Name.ToLower(),
-                            s => s.Folder.ToLower(),
-                            s => s.Service.ToLower(),
-                            s => s.FileContent.ToLower(),
-                            s => s.Description.ToLower())
+                                s => s.Folder.ToLower(),
+                                s => s.Service.ToLower(),
+                                s => s.FileContent.ToLower(),
+                                s => s.Description.ToLower())
                         .Containing(query.ToLower().Split(" "))
                         //.SearchChildren(s => s.Metadata)
                         //.With(s => s.Value.ToLower())
                         //.Containing(query.ToLower())
                         .AsParallel()
                         .ToList()
-                    : new List<DocumentsModel>()
             });
         }
 
@@ -143,8 +106,7 @@ namespace ArchiveDocuments.Controllers
                     Service = s.DServices.CaseNumber,
                     Folder = s.DServices.DFolder.FolderName,
                     Name = s.DServices.SDocument.DocumentName,
-                    Metadata = s.DServicesMetadata.Select(ss => new DocumentMetadata
-                        { Name = ss.MetadataName, Value = ss.MetadataValue }),
+                    Metadata = s.DServicesMetadata.Select(ss => new DocumentMetadata(ss.MetadataName, ss.MetadataValue)),
                     OrganizationName = s.DServices.DFolder.SOrganization.OrganizationName,
                     Files = s.DServicesDocumentFiles.ToList()
                 })
@@ -162,8 +124,8 @@ namespace ArchiveDocuments.Controllers
                             .Select(s => new { Name = s.OrganizationName, Id = s.Id }), "Id", "Name"),
                 DocumentList =
                     new SelectList(
-                        _context.SDocuments.AsNoTracking().Select(s => new { Name = s.DocumentName, Id = s.Id }), "Id",
-                        "Name"),
+                        _context.SDocuments.AsNoTracking()
+                            .Select(s => new { Name = s.DocumentName, Id = s.Id }), "Id", "Name"),
                 Document = new DServicesDocument()
             });
         }
@@ -204,23 +166,16 @@ namespace ArchiveDocuments.Controllers
 
         public IActionResult GetMetadataReference(Guid id)
         {
-            return PartialView("_PartialMetadata", _context.SDocumentMetadata.Where(w => w.SDocumentId == id).Select(
-                s => new AddDocumentMetadata
+            return PartialView("_PartialMetadata", _context.SDocumentMetadata.Where(w => w.SDocumentId == id)
+                .Select(s => new AddDocumentMetadata
                 {
                     Id = s.Id,
                     IsRequired = s.IsBinding,
                     Length = s.MetadataLength,
                     Name = s.MetadataName,
-                    MetadataType = (MetadataTypeEnum)s.Type
+                    MetadataType = (MetadataType)s.Type
                 }).ToList());
         }
-
-        public SelectList GetFolderReference(Guid id) => new(_context.DFolders.AsNoTracking()
-            .Where(w => w.SOrganizationId == id).Select(s => new { Name = s.FolderName, Id = s.Id }), "Id", "Name");
-
-        public SelectList GetServicesReference(Guid folderId, Guid documentId) => new(_context.DServices.AsNoTracking()
-            .Where(w => w.DFolderId == folderId && w.SDocumentId == documentId)
-            .Select(s => new { Name = s.CaseNumber, Id = s.Id }), "Id", "Name");
 
         [HttpPost]
         public async Task<IActionResult> AddDocument(DServicesDocument document, IFormFileCollection fileCollection, bool textRecognising)
@@ -238,7 +193,6 @@ namespace ArchiveDocuments.Controllers
                     FileExt = Path.GetExtension(file.FileName),
                     FileSize = (int)file.Length,
                     EmployeesNameAdd = UserInfo.UserName,
-                    //ContentType = file.ContentType,
                     DServicesDocumentId = document.Id
                 };
 
@@ -248,7 +202,6 @@ namespace ArchiveDocuments.Controllers
                     {
                         Language = OcrLanguage.Russian
                     };
-                    // Ocr.AddSecondaryLanguage(OcrLanguage.English);
                     using var input = new OcrInput(file.OpenReadStream());
                     //Input.Deskew();
                     input.Binarize();
